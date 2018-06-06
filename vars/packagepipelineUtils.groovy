@@ -66,8 +66,6 @@ class packagepipelineUtils implements Serializable {
             packagePipelineUtils.ciPipeline(body)
         } catch(e) {
             throw e
-        } finally {
-            cimetrics.writeToInflux()
         }
     }
 
