@@ -35,12 +35,13 @@ def setDistBranch() {
 
 /**
  * Library to set message fields to be published
- * @param messageType: ${MAIN_TOPIC}.ci.pipeline.allpackages.<defined-in-README>
- * @param artifact ${MAIN_TOPIC}.ci.pipeline.allpackages-${artifact}.<defined-in-README>
+ * @param messageType: ${MAIN_TOPIC}.ci.pipeline.${pipeline}.<defined-in-README>
+ * @param artifact ${MAIN_TOPIC}.ci.pipeline.${pipeline}-${artifact}.<defined-in-README>
+ * @param pipeline: allpackages or container
  * @return
  */
-def setMessageFields(String messageType, String artifact) {
-    topic = "${MAIN_TOPIC}.ci.pipeline.allpackages-${artifact}.${messageType}"
+def setMessageFields(String messageType, String artifact, def pipeline='allpackages') {
+    topic = "${MAIN_TOPIC}.ci.pipeline.${pipeline}-${artifact}.${messageType}"
     print("Topic is " + topic)
 
     // Create a HashMap of default message property keys and values
@@ -55,8 +56,6 @@ def setMessageFields(String messageType, String artifact) {
             build_id         : env.BUILD_ID,
             build_url        : env.JENKINS_URL + 'blue/organizations/jenkins/' + env.JOB_NAME + '/detail/' + env.JOB_NAME + '/' + env.BUILD_NUMBER + '/pipeline/',
             namespace        : env.fed_namespace,
-            nvr              : env.nvr,
-            original_spec_nvr: env.original_spec_nvr,
             ref              : env.basearch,
             scratch          : env.isScratch ? env.isScratch.toBoolean() : "",
             repo             : env.fed_repo,
@@ -67,6 +66,12 @@ def setMessageFields(String messageType, String artifact) {
             topic            : topic,
             username         : env.fed_owner,
     ]
+
+    // Add fields that only make sense for allpackages pipeline
+    if (pipeline == 'allpackages') {
+        messageProperties.nvr = env.nvr
+        messageProperties.original_spec_nvr = env.original_spec_nvr
+    }
 
     // Add image type to appropriate message types
     if (messageType in ['image.queued', 'image.running', 'image.complete', 'image.test.smoke.queued', 'image.test.smoke.running', 'image.test.smoke.complete'
