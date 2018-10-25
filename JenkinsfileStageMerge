@@ -17,11 +17,12 @@ properties([
     [
       $class: 'org.jenkinsci.plugins.ghprb.GhprbTrigger',
       orgslist: 'CentOS-PaaS-SIG',
+      userWhitelist(['bgoncalv', 'thrix', 'Andrei-Stepanov']),
       cron: 'H/5 * * * *',
       triggerPhrase: '.*\\[merge\\].*',
       onlyTriggerPhrase: true,
       useGitHubHooks: true,
-      permitAll: true,
+      permitAll: false,
       autoCloseFailedPullRequests: false,
       displayBuildErrorsOnDownstreamBuilds: true,
       extensions: [
